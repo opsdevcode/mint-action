@@ -22,6 +22,8 @@ fi
 )
 
 python -m venv "${dest}/venv"
-"${dest}/venv/bin/pip" install --no-cache-dir --no-index "${dest}/${wheel}"
+# Wheel bytes are the GitHub Release artifact (checksummed above).
+# Runtime deps such as PyYAML resolve from the package index.
+"${dest}/venv/bin/pip" install --no-cache-dir "${dest}/${wheel}"
 echo "${dest}/venv/bin" >> "${GITHUB_PATH}"
 "${dest}/venv/bin/mint" version
