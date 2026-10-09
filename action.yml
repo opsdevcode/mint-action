@@ -1,0 +1,59 @@
+name: Mint
+description: Install pinned Mint from a GitHub Release wheel and run check or plan
+author: opsdevcode
+branding:
+  icon: check-circle
+  color: green
+inputs:
+  project:
+    description: Directory that contains mint.toml
+    required: false
+    default: "."
+  command:
+    description: Mint command to run (check or plan)
+    required: false
+    default: "check"
+  language-tag:
+    description: specmint-language GitHub Release tag
+    required: false
+    default: "v0.7.0-alpha.2"
+  language-repository:
+    description: Language GitHub repository
+    required: false
+    default: "opsdevcode/specmint-language"
+  language-wheel:
+    description: Wheel filename on that release
+    required: false
+    default: "specmint-0.7.0a2-py3-none-any.whl"
+  python-version:
+    description: CPython version used to install the wheel
+    required: false
+    default: "3.12"
+  sarif-output:
+    description: Path for a SARIF 2.1.0 file (empty results when check succeeds)
+    required: false
+    default: "mint.sarif"
+outputs:
+  sarif-output:
+    description: Path written for Code Scanning
+    value: ${{ inputs.sarif-output }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install Mint from GitHub Release
+      shell: bash
+      env:
+        LANGUAGE_TAG: ${{ inputs.language-tag }}
+        LANGUAGE_REPOSITORY: ${{ inputs.language-repository }}
+        LANGUAGE_WHEEL: ${{ inputs.language-wheel }}
+      run: bash "${GITHUB_ACTION_PATH}/scripts/install_mint.sh"
+    - name: Run Mint
+      shell: bash
+      env:
+        MINT_PROJECT: ${{ inputs.project }}
+        MINT_COMMAND: ${{ inputs.command }}
+        MINT_SARIF_OUTPUT: ${{ inputs.sarif-output }}
+      run: bash "${GITHUB_ACTION_PATH}/scripts/run_mint.sh"
