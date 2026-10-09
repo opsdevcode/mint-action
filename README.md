@@ -6,7 +6,8 @@ on `ubuntu-latest` / Python 3.12, and runs `mint check` or `mint plan`.
 
 Public preview. No `mint apply`. No live mutation. No Marketplace
 listing. Pin an immutable commit SHA; there is no `latest` and no
-`@main`.
+`@main`. GitHub Releases, when they exist, come from Release Please after
+a squash-merge. Do not pin `@v1` or a tag in workflows.
 
 ## Default pins
 
