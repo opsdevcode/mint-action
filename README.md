@@ -5,7 +5,8 @@ First-party composite GitHub Action for Mint. It downloads an exact
 on `ubuntu-latest` / Python 3.12, and runs `mint check` or `mint plan`.
 
 Public preview. No `mint apply`. No live mutation. No Marketplace
-listing. Pin a tag; there is no `latest`.
+listing. Pin an immutable commit SHA; there is no `latest` and no
+`@main`.
 
 ## Default pins
 
@@ -34,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: opsdevcode/mint-action@main
+      - uses: opsdevcode/mint-action@29918519e95b10eec7cbc3ffd253d7c5286599f6
         with:
           project: .
           command: check
