@@ -16,6 +16,15 @@ WORKFLOW = ROOT / ".github" / "workflows" / "release-train.yml"
 CI = ROOT / ".github" / "workflows" / "ci.yml"
 README = ROOT / "README.md"
 STARTER_PIN = "29918519e95b10eec7cbc3ffd253d7c5286599f6"
+VERSION_PATTERN = r"^0\.[0-9]+\.[0-9]+-alpha\.[0-9]+$"
+RELEASE_PLEASE_VERSION_MARKER = "x-release-please-version"
+
+
+def _semver_on_line(line: str) -> str:
+    token = line.split("#", 1)[0].strip()
+    if not token:
+        raise AssertionError(f"missing version before comment: {line!r}")
+    return token
 
 
 class ReleaseAutomationTests(unittest.TestCase):
@@ -47,9 +56,15 @@ class ReleaseAutomationTests(unittest.TestCase):
         self.assertEqual(pkg["versioning-strategy"], "prerelease")
         self.assertTrue(pkg["include-v-in-tag"])
         self.assertFalse(pkg["include-component-in-tag"])
+        self.assertEqual(pkg["extra-files"], ["VERSION"])
+        version_text = VERSION.read_text(encoding="utf-8")
+        self.assertIn(RELEASE_PLEASE_VERSION_MARKER, version_text)
+        version_lines = [line for line in version_text.splitlines() if line.strip()]
+        self.assertEqual(len(version_lines), 1)
+        published = _semver_on_line(version_lines[0])
+        self.assertRegex(published, VERSION_PATTERN)
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-        self.assertEqual(manifest["."], "0.1.0-alpha.0")
-        self.assertEqual(VERSION.read_text(encoding="utf-8").strip(), "0.1.0-alpha.0")
+        self.assertEqual(manifest["."], published)
 
     def test_release_train_is_push_main_only_and_pinned(self) -> None:
         text = WORKFLOW.read_text(encoding="utf-8")
